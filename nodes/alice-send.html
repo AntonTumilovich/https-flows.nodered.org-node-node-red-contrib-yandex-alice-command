@@ -1,0 +1,56 @@
+<script type="text/html" data-template-name="alice-send">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-login"><i class="icon-tag"></i> Yandex login</label>
+        <input type="text" id="node-input-login" placeholder="Yandex login">
+    </div>
+    <div class="form-row">
+        <label for="node-input-command_type"><i class="icon-tag"></i> Command type</label>
+        <select id="node-input-command_type">
+          <option value="json">JSON data</option>
+          <option value="tts">Text to speach</option>
+          <option value="cmd">Voice command</option>
+        </select>
+    </div>
+</script>
+
+
+
+<script type="text/html" data-help-name="alice-send">
+    <p>Send voice command or TTS to Yandex Alice speaker</p>
+</script>
+
+
+<script type="text/javascript">
+
+    RED.nodes.registerType('alice-send',{
+        category: 'Speaker',
+        color: '#9874fc',
+        defaults: {
+            login: {
+                type: "yandex-alice-login",
+                required: true
+            },
+            command_type: {value:"json"}
+        },
+        inputs:1,
+        outputs:1,
+        align: 'right',
+        icon: "alice.png",
+        label: function() {
+            return this.name||"alice-send";
+        },
+        oneditprepare: function ()
+        {
+          var node = this;
+//          Get_Device_From_Cloud(node.cloud_token, node.device_type, node.device_id);
+        },
+        oneditsave: function ()
+        {
+        }
+    });
+</script>
+

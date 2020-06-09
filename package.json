@@ -1,0 +1,31 @@
+{
+  "name": "node-red-contrib-yandex-alice-command",
+  "node-red": {
+    "nodes": {
+      "alice-send": "nodes/alice-send.js",
+      "alice-login": "nodes/alice-login.js"
+    }
+  },
+  "keywords": [
+    "node-red",
+    "yandex-alice-command",
+    "yandex",
+    "alice"
+  ],
+  "version": "1.0.2",
+  "description": "yandex-alice-command system",
+  "main": "yandex-alice-command.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Anton Tumilovich",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "request": "^2.88.2",
+    "request-promise": "^4.2.5",
+    "request-promise-native": "^1.0.8"
+  },
+  "directories": {
+    "lib": "lib"
+  }
+}
