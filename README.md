@@ -3,9 +3,9 @@ Node-RED nodes for send command and tts to Yandex Alice
 Nodes:
 * alice-send Send voice command or text to speach to any Yandex.Alice speakers.
 
-Examples:
-https://www.youtube.com/watch?v=kY6g7x9B-PU
-https://www.youtube.com/watch?v=ldF4b11SaiQ
+Examples:  
+https://www.youtube.com/watch?v=kY6g7x9B-PU  
+https://www.youtube.com/watch?v=ldF4b11SaiQ  
 
 
 
