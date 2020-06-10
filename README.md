@@ -6,8 +6,11 @@ Nodes:
 Examples:  
 https://www.youtube.com/watch?v=kY6g7x9B-PU  
 https://www.youtube.com/watch?v=ldF4b11SaiQ  
-
-
+  
+Installation:  
+npm install node-red-contrib-yandex-alice-command  
+  
+  
 
 <img src="http://wiki.swiitch.ru/images/3/3e/Node_red_yandex_alice.png">
 <img src="http://wiki.swiitch.ru/images/d/d0/Node_red_yandex_alice_get_token.png">
