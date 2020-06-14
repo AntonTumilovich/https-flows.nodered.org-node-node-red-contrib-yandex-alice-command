@@ -12,7 +12,7 @@
     "yandex",
     "alice"
   ],
-  "version": "1.0.2",
+  "version": "1.0.5",
   "description": "yandex-alice-command system",
   "main": "yandex-alice-command.js",
   "scripts": {
