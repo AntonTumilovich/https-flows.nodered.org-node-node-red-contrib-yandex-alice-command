@@ -112,6 +112,9 @@ module.exports = function(RED)
           var cookies = node.cookies;
           var scenario_id = node.scenario_id;
           var speaker_id = node.speaker_id;
+          var is_speaker_all = false;
+          var speaker_id_all = [];
+          var speaker_name_all = [];
           var speaker_name = node.speaker_name;
           var scenario_name = node.scenario_name;
 
@@ -172,6 +175,7 @@ module.exports = function(RED)
             {
               is_speaker_set = true;
               speaker_id = speaker_id.replace(new RegExp('"', 'g'), '');
+              speaker_id_all.push(speaker_id);
             }
           }
 
@@ -181,7 +185,16 @@ module.exports = function(RED)
             {
               is_speaker_name_set = true;
               speaker_name = speaker_name.replace(new RegExp('"', 'g'), '');
+              speaker_name_all.push(speaker_name);
             }
+            else
+            {
+              speaker_name_all = true;
+            }
+          }
+          else
+          {
+            speaker_name_all = true;
           }
 
           if (typeof(scenario_name) != "undefined" && scenario_name !== null)
@@ -471,15 +484,18 @@ module.exports = function(RED)
                 {
                   if (device_item.name.indexOf(speaker_name) > -1)
                   {
+                    if (is_debug) {Debug_Log("Get devices: found names speaker " + device_item.name + ", id: " + device_item.id);}
 //                    node.send("found NAMED spekaer is " + device_item.name);
                     speaker_id = device_item.id;
+                    speaker_id_all.push(speaker_id);
                   }
                 }
                 else
                 {
 //                node.send("found speaker is " + device_item.name);
                   speaker_id = device_item.id;
-                  if (is_debug) {Debug_Log("Get devices: found speaker ID is " + speaker_id);}
+                  speaker_id_all.push(speaker_id);
+                  if (is_debug) {Debug_Log("Get devices: found speaker " + device_item.name + ", id: " + device_item.id);}
                 }
               }
             });
@@ -662,7 +678,7 @@ module.exports = function(RED)
 
 
 ////////////////////// NOW SEND COMMAND Begin ////////////////
-            if (!is_fail_token && !is_fail_cookies && speaker_id.length > 0 && scenario_id.length > 0 && !is_fail_speaker && !is_fail_scenario)
+            if (!is_fail_token && !is_fail_cookies && speaker_id.length > 0 && scenario_id.length > 0 && !is_fail_speaker && !is_fail_scenario && speaker_id_all.length > 0)
             {
               if (is_debug) {Debug_Log("Execute command: begin");}
 
@@ -683,18 +699,25 @@ module.exports = function(RED)
               send_data.devices = new Array();
               send_data.external_actions = new Array();
               send_data.external_actions.push(new Object());
-              send_data.external_actions[0].type = new String('scenario.external_action.' + action);
-              send_data.external_actions[0].parameters = {};
-              send_data.external_actions[0].parameters.current_device = new Boolean(false);
-              send_data.external_actions[0].parameters.device_id = new String(speaker_id);
-              if (is_cmd)
+
+              speaker_id_all.forEach(function(item, i, arr)
               {
-                send_data.external_actions[0].parameters.text = new String(text);
-              }
-              else
-              {
-                send_data.external_actions[0].parameters.phrase = new String(text);
-              }
+                send_data.external_actions[i].type = new String('scenario.external_action.' + action);
+                send_data.external_actions[i].parameters = {};
+                send_data.external_actions[i].parameters.current_device = new Boolean(false);
+//                send_data.external_actions[speaker_num].parameters.device_id = new String(speaker_id);
+                send_data.external_actions[i].parameters.device_id = new String(item);
+                if (is_cmd)
+                {
+                  send_data.external_actions[i].parameters.text = new String(text);
+                }
+                else
+                {
+                  send_data.external_actions[i].parameters.phrase = new String(text);
+                }
+              });
+
+
               send_data_str = JSON.stringify(send_data);
 //              node.send(send_data);
 //              node.send("to send : " + send_data_str);
