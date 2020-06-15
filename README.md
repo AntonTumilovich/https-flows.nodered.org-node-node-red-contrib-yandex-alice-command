@@ -21,7 +21,7 @@ Changes in version 1.07 15/06/20:
 * Fixed Get token with pasword that include special chars  
   
 Changes in version 1.08 15/06/20:  
-* Added Send to All speakers or to one speaker  
+* Added Send to All speakers or to selected speaker  
   
   
 <img src="http://wiki.swiitch.ru/images/3/3e/Node_red_yandex_alice.png">

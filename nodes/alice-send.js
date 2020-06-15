@@ -698,10 +698,9 @@ module.exports = function(RED)
               send_data.trigger_type = new String('scenario.trigger.voice');
               send_data.devices = new Array();
               send_data.external_actions = new Array();
-              send_data.external_actions.push(new Object());
-
               speaker_id_all.forEach(function(item, i, arr)
               {
+                send_data.external_actions.push(new Object());
                 send_data.external_actions[i].type = new String('scenario.external_action.' + action);
                 send_data.external_actions[i].parameters = {};
                 send_data.external_actions[i].parameters.current_device = new Boolean(false);
