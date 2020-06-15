@@ -9,23 +9,27 @@
   "keywords": [
     "node-red",
     "yandex-alice-command",
-    "yandex",
-    "alice"
+    "mqtt"
   ],
-  "version": "1.0.5",
+  "bugs": {
+    "url": "https://github.com/AntonTumilovich/https-flows.nodered.org-node-node-red-contrib-yandex-alice-command/issues/"
+  },
+  "homepage": "https://github.com/AntonTumilovich/https-flows.nodered.org-node-node-red-contrib-yandex-alice-command",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AntonTumilovich/https-flows.nodered.org-node-node-red-contrib-yandex-alice-command.git"
+  },
+  "version": "1.0.7",
   "description": "yandex-alice-command system",
   "main": "yandex-alice-command.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Anton Tumilovich",
-  "license": "GPL-3.0",
+  "license": "GPL",
   "dependencies": {
     "request": "^2.88.2",
     "request-promise": "^4.2.5",
     "request-promise-native": "^1.0.8"
-  },
-  "directories": {
-    "lib": "lib"
   }
 }

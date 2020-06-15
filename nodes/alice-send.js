@@ -33,6 +33,11 @@ module.exports = function(RED)
         this.scenario_name = this.login_node.scenario_name;
         this.speaker_id = this.login_node.speaker_id;
         this.scenario_id = this.login_node.scenario_id;
+
+        this.debug_enable = this.login_node.debug_enable;
+//        this.debug_enable = true;
+
+
 //this.user = this.login_node.username;
 //this.pass = this.login_node.password;
 
@@ -48,11 +53,22 @@ module.exports = function(RED)
 */
 
         var node = this;
+//node.log('debug is ' + this.debug_enable);
+
+       function Debug_Log(msg_text)
+       {
+//         if (!node.debug_enable) {return;}
+         node.log(msg_text);
+         var msg = {};
+         msg.payload = msg_text;
+         node.send(msg);
+       }
+
         node.on('input', function(msg)
         {
 
-//node.log("login username is " + node.user);
-//node.log("login password is " + node.pass);
+//node.send("login username is " + node.user);
+//node.send("login password is " + node.pass);
 
           var text = '';
           var is_cmd = false;
@@ -87,7 +103,7 @@ module.exports = function(RED)
           }
 
 
-          var is_debug = false;
+          var is_debug = node.debug_enable;
           var csrf_token = '';
 
           var default_scenario = "Голос";
@@ -108,8 +124,18 @@ module.exports = function(RED)
 
           var is_found_scenario = false;
 
-//          node.log("token is " + token);
-//          node.log("cookies is " + cookies);
+
+          var is_fail_token = false;
+          var is_fail_csrf_token = false;
+          var is_fail_cookies = false;
+          var is_fail_scenario = false;
+          var is_fail_scenario_add = false;
+          var is_fail_scenario_update = false;
+          var is_fail_scenario_run = false;
+          var is_fail_speaker = false;
+
+//          node.send("token is " + token);
+//          node.send("cookies is " + cookies);
 
 /////////////// IF NOT SET TOKEN OR COOKIE : GET IT Begin ////////
 //          if (true)
@@ -175,13 +201,14 @@ module.exports = function(RED)
           }
 
 
+        node.status({}); //clean
 
 
         async function make_action()
         {
               function redirect_go(body, response, resolveWithFullResponse)
               {
-                if (is_debug) {node.log("get cookie stage 2 redirect ");}
+                if (is_debug) {Debug_Log("Get cookies: stage 2: redirect");}
 //                node.send(body);
 //                node.send(resolveWithFullResponse);
                 var headers = response.headers;
@@ -190,10 +217,10 @@ module.exports = function(RED)
                 headers['set-cookie'].forEach(function(item, i, arr)
                 {
                   tmp_cookie = item.substring(0, item.indexOf('; ')) + ";";
-//                  node.log("cookie " + i + " is " + tmp_cookie);
+//                  node.send("cookie " + i + " is " + tmp_cookie);
                   cookies += tmp_cookie;
                 });
-//                node.log("full cookies is " + cookies);
+//                node.send("full cookies is " + cookies);
 ///////////////// SEND MESSAGE IN THIS STRING ///////////
                 if (response.statusCode === 302) {} else {}
               }
@@ -204,13 +231,20 @@ module.exports = function(RED)
           if (!is_token_set)
           {
 /////////////// GET MAIN TOKEN Begin //////////////
-          if (is_debug) {node.log("begin get token");}
+          if (is_debug) {Debug_Log("Get token: begin");}
+
+          var encode_username = encodeURIComponent(node.username);
+          var encode_password = encodeURIComponent(node.password);
+
+//          if (is_debug) {Debug_Log("Get token: login string is " + 'client_secret=' + y_alice.client_secret + '&client_id=' + y_alice.client_id + '&grant_type=' + 'password' + '&username=' + node.username + '&password=' + node.password);}
+//          if (is_debug) {Debug_Log("Get token: login string is " + 'client_secret=' + y_alice.client_secret + '&client_id=' + y_alice.client_id + '&grant_type=' + 'password' + '&username=' + encode_username + '&password=' + encode_password);}
 
           var options =
           {
             method: 'POST',
             uri: 'https://oauth.yandex.ru/token',
-            body: 'client_secret=' + y_alice.client_secret + '&client_id=' + y_alice.client_id + '&grant_type=' + 'password' + '&username=' + node.username + '&password=' + node.password,
+            body: 'client_secret=' + y_alice.client_secret + '&client_id=' + y_alice.client_id + '&grant_type=' + 'password' + '&username=' + encode_username + '&password=' + encode_password,
+//            body: 'client_secret=' + y_alice.client_secret + '&client_id=' + y_alice.client_id + '&grant_type=' + 'password' + '&username=' + node.username + '&password=' + node.password,
              headers: {
         /* 'content-type': 'application/x-www-form-urlencoded' */ // Is set automatically
             },
@@ -224,21 +258,31 @@ module.exports = function(RED)
           {
             var data = JSON.parse(body.body);
             token = data.access_token;
-            if (is_debug) {node.log("get token - ok : " + token);}
+            if (is_debug) {Debug_Log("Get token: ok");}
+//            if (is_debug) {Debug_Log("get token - ok : " + token);}
 //            node.send(token);
 
-//            node.log("TRY GET COOKIES with token " + token);
+//            node.send("TRY GET COOKIES with token " + token);
           })
           .catch(function (err) {
-          if (is_debug) {node.log("get token - fail " + err);}
+          is_fail_token = true;
+          Debug_Log("Get token: fail " + err);
+          node.status({
+            fill: "red",
+            shape: "dot",
+            text: "Alice:token:error:" + err
+          });
+
+//          if (err.indexOf('login or password is not valid') > -1) {Debug_Log('Login or password is not valid');}
+//          if (err.error_description.indexOf('login or password is not valid') > -1) {Debug_Log('Login or password is not valid');}
         });
 /////////////// GET MAIN TOKEN End //////////////
 }
 
-          if (!is_cookies_set)
+          if (!is_cookies_set && !is_fail_token)
           {
 
-          if (is_debug) {node.log("begin get cookies");}
+          if (is_debug) {Debug_Log("Get cookies: begin");}
 
 
 /////////////// GET COOKIES Begin //////////////
@@ -266,15 +310,15 @@ module.exports = function(RED)
               passport_host = data_2.passport_host;
               track_id = data_2.track_id;
 //            node.send(token);
-//              node.log("get cookie - status : " + cookie_data.status);
+//              node.send("get cookie - status : " + cookie_data.status);
 //              node.send(body);
             })
             .catch(function (err) {
-//              node.log("get cookie - fail " + err);
+//              node.send("get cookie - fail " + err);
             });
 
 
-              if (is_debug) {node.log("get cookies stage 2");}
+              if (is_debug) {Debug_Log("Get cookies: stage 2: begin");}
               var options =
               {
                 method: 'POST',
@@ -299,14 +343,14 @@ module.exports = function(RED)
 //              passport_host = cookie_data.passport_host;
 //              track_id = cookie_data.track_id;
 //            node.send(token);
-//              node.log("get cookie stage 2 - status : ");
+//              node.send("get cookie stage 2 - status : ");
 //              node.send(body);
 
 
               })
               .catch(function (err) {
 //                node.send(body);
-//                node.log("get cookie stage 2  - fail " + err);
+//                node.send("get cookie stage 2  - fail " + err);
               });
 
 /////////////// GET COOKIES End //////////////
@@ -315,7 +359,9 @@ module.exports = function(RED)
 
 
 /////////////// GET CSRF TOKEN Begin //////////////
-            if (is_debug) {node.log("begin get csrf");}
+          if (!is_fail_token && !is_fail_cookies)
+          {
+            if (is_debug) {Debug_Log("Get csrf token: begin");}
             var options =
             {
 //              method: 'POST',
@@ -335,7 +381,7 @@ module.exports = function(RED)
             {
 //              var data = JSON.parse(body.body);
 //              token = data.access_token;
-              if (is_debug) {node.log("get csrf token - ok ");}
+              if (is_debug) {Debug_Log("Get csrf token: ok");}
               tmp_body = body.body;
               tmp_csrf_token = tmp_body.substring(tmp_body.indexOf('"csrfToken2":"'));
               tmp_csrf_token = tmp_csrf_token.substring(tmp_csrf_token.indexOf('":"'), tmp_csrf_token.indexOf('","'));
@@ -343,16 +389,24 @@ module.exports = function(RED)
               tmp_csrf_token = tmp_csrf_token.replace(new RegExp('":"', 'g'), '');
 //             tmp_csrf_token = tmp_csrf_token.replace('":"','');
               csrf_token = tmp_csrf_token;
-//              node.log("csrf token is " + csrf_token);
+//              node.send("csrf token is " + csrf_token);
 
 //              node.send(body);
-//node.log(body.body);
+//node.send(body.body);
             })
             .catch(function (err)
             {
               node.send(err);
-              if (is_debug) {node.log("get csrf token - fail " + err);}
+              is_fail_csrf_token = true;
+              if (is_debug) {Debug_Log("Get csrf token: fail " + err);}
+              node.status({
+                fill: "red",
+                shape: "dot",
+                text: "Alice:csrf token:error:" + err
+              });
+              return;
             });
+          }
 /////////////// GET CSRF TOKEN End //////////////
 
 
@@ -362,11 +416,11 @@ module.exports = function(RED)
 //          node.send(msg);
 
 
-          if (!is_speaker_set)
+          if (!is_speaker_set && !is_fail_token && !is_fail_cookies)
           {
             var devices_data = '';
 /////////////// GET devices Begin //////////////
-            if (is_debug) {node.log("begin get devices");}
+            if (is_debug) {Debug_Log("Get devices: begin");}
             var options =
             {
 //              method: 'POST',
@@ -384,55 +438,83 @@ module.exports = function(RED)
             await rp(options) ///// get devices
             .then(function (body)
             {
-              if (is_debug) {node.log("get devices - ok ");}
+              if (is_debug) {Debug_Log("Get devices: ok");}
 //              node.send(body);
               devices_data = JSON.parse(body.body);
             })
             .catch(function (err)
             {
               node.send(err);
-              if (is_debug) {node.log("get devices - fail " + err);}
+              is_fail_speaker = true;
+              if (is_debug) {Debug_Log("Get devices: fail " + err);}
+              node.status({
+                fill: "red",
+                shape: "dot",
+                text: "Alice:devices:error:" + err
+              });
             });
 /////////////// GET devices End //////////////
 
 /////////////// GET Search SPEAKER Begin //////////////
-        devices_data.rooms.forEach(function(item, i, arr)
+//        if (device_data.rooms.length > 0)
+        if (typeof(devices_data.rooms) != "undefined" && devices_data.rooms != null && !is_fail_speaker)
         {
-//          node.log("room " + i + " name is " + item.name);
-          room_devices = item.devices;
-          room_devices.forEach(function(device_item, i, arr)
+          devices_data.rooms.forEach(function(item, i, arr)
           {
-            if (device_item.type.indexOf("devices.types.smart_speaker") > -1 || device_item.type.indexOf("yandex.module") > -1)
+//          node.send("room " + i + " name is " + item.name);
+            room_devices = item.devices;
+            room_devices.forEach(function(device_item, i, arr)
             {
-              if (is_speaker_name_set)
+              if (device_item.type.indexOf("devices.types.smart_speaker") > -1 || device_item.type.indexOf("yandex.module") > -1)
               {
-                if (device_item.name.indexOf(speaker_name) > -1)
+                if (is_speaker_name_set)
                 {
-//                  node.log("found NAMED spekaer is " + device_item.name);
+                  if (device_item.name.indexOf(speaker_name) > -1)
+                  {
+//                    node.send("found NAMED spekaer is " + device_item.name);
+                    speaker_id = device_item.id;
+                  }
+                }
+                else
+                {
+//                node.send("found speaker is " + device_item.name);
                   speaker_id = device_item.id;
+                  if (is_debug) {Debug_Log("Get devices: found speaker ID is " + speaker_id);}
                 }
               }
-              else
-              {
-//                node.log("found spekaer is " + device_item.name);
-                speaker_id = device_item.id;
-              }
-            }
+            });
           });
-        });
 
-              if (is_debug) {node.log("found spekaer ID is " + speaker_id);}
-////         node.log("room is " + devices.rooms[0].name);
+
+        }
+        else
+        {
+          if (is_debug) {Debug_Log("Get devices: error: no devices in account");}
+        }
+////         node.send("room is " + devices.rooms[0].name);
 /////////////// GET Search SPEAKER End //////////////
          }
 
+/////////////// GET VERIFY SPEAKER Begin //////////////
+          if (typeof(speaker_id) == "undefined" || speaker_id == null)
+          {
+            is_fail_speaker = true;
+            if (is_debug) {Debug_Log("Get devices: error: no speakers in account");}
+          }
+          else if (speaker_id.length < 2)
+          {
+            is_fail_speaker = true;
+            if (is_debug) {Debug_Log("Get devices: error: no speaker in account");}
+          }
+/////////////// GET VERIFY SPEAKER End //////////////
 
 
-          if (!is_scenario_set)
+
+          if (!is_scenario_set && !is_fail_token && !is_fail_cookies)
           {
             var scenarios_data = '';
 /////////////// GET scenarios Begin //////////////
-            if (is_debug) {node.log("begin get scenarios");}
+            if (is_debug) {Debug_Log("Get scenarios: begin");}
             var options =
             {
 //              method: 'POST',
@@ -451,39 +533,52 @@ module.exports = function(RED)
             .then(function (body)
             {
 //              var data = JSON.parse(body.body);
-              if (is_debug) {node.log("get scenarios - ok ");}
+              if (is_debug) {Debug_Log("Get scenarios: ok");}
 //              node.send(body);
               scenarios_data = JSON.parse(body.body);
             })
             .catch(function (err)
             {
               node.send(err);
-              if (is_debug) {node.log("get scenarios - fail " + err);}
+              is_fail_scenario = true;
+              if (is_debug) {Debug_Log("Get scenarios: fail " + err);}
+              node.status({
+                fill: "red",
+                shape: "dot",
+                text: "Alice:scenarios:get:error:" + err
+              });
             });
 /////////////// GET scenarios End //////////////
 /////////////// GET Search SCENARIO Begin //////////////
-        scenarios_data.scenarios.forEach(function(item, i, arr)
+        if (typeof(scenarios_data.scenarios) != "undefined" && scenarios_data.scenarios != null && !is_fail_scenario)
         {
-//          node.log("scenarios " + i + " name is " + item.name);
-          if (item.name.indexOf(scenario_name) > -1)
+          scenarios_data.scenarios.forEach(function(item, i, arr)
           {
-//            node.log("found scenario is " + item.name);
-            scenario_id = item.id;
-            is_found_scenario = true;
-          }
-        });
+//            node.send("scenarios " + i + " name is " + item.name);
+            if (item.name.indexOf(scenario_name) > -1)
+            {
+//              node.send("found scenario is " + item.name);
+              scenario_id = item.id;
+              is_found_scenario = true;
+            }
+          });
+        }
+        else
+        {
+          if (is_debug) {Debug_Log("Get scenarios: no scenarios in account");}
+        }
 
-////         node.log("room is " + devices.rooms[0].name);
+////         node.send("room is " + devices.rooms[0].name);
 /////////////// GET Search SCENARIO End //////////////
 
 /////////////// GET ADD SCENARIO Begin //////////////
            if (is_found_scenario)
            {
-             if (is_debug) {node.log("found scenario ID is " + scenario_id);}
+             if (is_debug) {Debug_Log("Get scenarios: found scenario ID is " + scenario_id);}
            }
            else
            {
-              if (is_debug) {node.log("begin add scenario");}
+              if (is_debug) {Debug_Log("Add scenario: begin");}
 
               var send_data = {};
 //              send_data.push(new Object());
@@ -500,7 +595,7 @@ module.exports = function(RED)
               send_data.external_actions[0].parameters.phrase = new String('-');
 //              node.send(send_data);
               send_data_str = JSON.stringify(send_data);
-//              node.log("to send : " + send_data_str);
+//              node.send("to send : " + send_data_str);
 
               var options =
               {
@@ -523,27 +618,41 @@ module.exports = function(RED)
               .then(function (body)
               {
 //              var data = JSON.parse(body.body);
-                if (is_debug) {node.log("ADD scenarios - ok ");}
+                if (is_debug) {Debug_Log("Add scenarios: ok");}
 //                node.send(body);
 //                scenarios_data = JSON.parse(body.body);
               })
               .catch(function (err)
               {
 //                node.send(err);
-                if (is_debug) {node.log("ADD scenarios - fail " + err);}
+                is_fail_scenario_add = true;
+                if (is_debug) {Debug_Log("Add scenarios: fail " + err);}
+                node.status({
+                  fill: "red",
+                  shape: "dot",
+                  text: "Alice:scenarios:add:error:" + err
+                });
               });
 /////////////// ADD scenarios End //////////////
 /////////////// GET Search SCENARIO Begin //////////////
-        scenarios_data.scenarios.forEach(function(item, i, arr)
+        if (typeof(scenarios_data.scenarios) != "undefined" && scenarios_data.scenarios != null && !is_fail_scenario_add)
         {
-//          node.log("scenarios " + i + " name is " + item.name);
-          if (item.name.indexOf(scenario_name) > -1)
+          scenarios_data.scenarios.forEach(function(item, i, arr)
           {
-//            node.log("found scenario is " + item.name);
-            scenario_id = item.id;
-            is_found_scenario = true;
-          }
-        });
+//            node.send("scenarios " + i + " name is " + item.name);
+            if (item.name.indexOf(scenario_name) > -1)
+            {
+//              node.send("found scenario is " + item.name);
+              scenario_id = item.id;
+              is_found_scenario = true;
+            }
+          });
+        }
+        else
+        {
+          node.send("scenario fail");
+        }
+
            }
 /////////////// GET ADD SCENARIO End //////////////
 
@@ -553,7 +662,9 @@ module.exports = function(RED)
 
 
 ////////////////////// NOW SEND COMMAND Begin ////////////////
-              if (is_debug) {node.log("begin execute command");}
+            if (!is_fail_token && !is_fail_cookies && speaker_id.length > 0 && scenario_id.length > 0 && !is_fail_speaker && !is_fail_scenario)
+            {
+              if (is_debug) {Debug_Log("Execute command: begin");}
 
               var action = 'phrase';
               if (is_cmd)
@@ -586,7 +697,7 @@ module.exports = function(RED)
               }
               send_data_str = JSON.stringify(send_data);
 //              node.send(send_data);
-//              node.log("to send : " + send_data_str);
+//              node.send("to send : " + send_data_str);
 
               var options =
               {
@@ -609,14 +720,20 @@ module.exports = function(RED)
               .then(function (body)
               {
 //              var data = JSON.parse(body.body);
-                if (is_debug) {node.log("UPDATE scenarios - ok ");}
+                if (is_debug) {Debug_Log("Execute command: update scenario: ok");}
 //                node.send(body);
 //                scenarios_data = JSON.parse(body.body);
               })
               .catch(function (err)
               {
 //                node.send(err);
-                if (is_debug) {node.log("UPDATE scenarios - fail " + err);}
+                is_fail_scenario_update = true;
+                if (is_debug) {Debug_Log("Execute command: upadate scenario: fail " + err);}
+                node.status({
+                  fill: "red",
+                  shape: "dot",
+                  text: "Alice:scenarios:update:error:" + err
+                });
               });
 
               var options =
@@ -638,16 +755,28 @@ module.exports = function(RED)
               .then(function (body)
               {
 //              var data = JSON.parse(body.body);
-                if (is_debug) {node.log("RUN scenarios - ok ");}
+                if (is_debug) {Debug_Log("Execute command: run scenario: ok");}
+                node.status({
+                    fill: "green",
+                    shape: "dot",
+                    text: "Alice:run:ok"
+                });
+
 //                node.send(body);
 //                scenarios_data = JSON.parse(body.body);
               })
               .catch(function (err)
               {
 //                node.send(err);
-                if (is_debug) {node.log("RUN scenarios - fail " + err);}
+                is_fail_scenario_run = true;
+                if (is_debug) {Debug_Log("Execute command: run scenario: fail " + err);}
+                node.status({
+                  fill: "red",
+                  shape: "dot",
+                  text: "Alice:scenarios:run:error:" + err
+                });
               });
-
+            }
 ////////////////////// NOW SEND COMMAND End ////////////////
 
 
@@ -656,13 +785,16 @@ module.exports = function(RED)
 
                 if (!is_token_set || !is_cookies_set || !is_speaker_set || !is_scenario_set)
                 {
-                  if (is_debug) {node.log("show all data");}
-                  msg.token = token;
-                  msg.cookies = cookies;
-                  msg.speaker_id = speaker_id;
-                  msg.scenario_id = scenario_id;
-//                  msg.payload = '{"token":"' + token + '","cookies":"' + cookies + '"}';
-                  node.send(msg);
+                  if (!is_fail_token && !is_fail_cookies && !is_fail_scenario && !is_fail_speaker)
+                  {
+                    if (is_debug) {Debug_Log("Show all data: ok");}
+                    msg.token = token;
+                    msg.cookies = cookies;
+                    msg.speaker_id = speaker_id;
+                    msg.scenario_id = scenario_id;
+                    msg.payload = '{"token":"' + token + '","cookies":"' + cookies + '"}';
+                    node.send(msg);
+                  }
                 }
 ///////////////// SEND DATA End ///////////
 

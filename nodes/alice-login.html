@@ -6,20 +6,20 @@
         <input type="text" id="node-config-input-name" placeholder="Name">
     </div>
     <div class="form-row">
-        <label for="node-input-username"><i class="fa fa-user"></i> Username</label>
+        <label for="node-config-input-username"><i class="fa fa-user"></i> Username</label>
         <input type="text" id="node-config-input-username" placeholder="Yandex Username">
     </div>
     <div class="form-row">
-        <label for="node-input-password"><i class="fa fa-lock"></i> Password</label>
+        <label for="node-config-input-password"><i class="fa fa-lock"></i> Password</label>
         <input type="password" id="node-config-input-password" placeholder="Yandex password">
     </div>
 
     <div class="form-row">
-        <label for="node-input-token"><i class="fa fa-globe"></i> Token</label>
+        <label for="node-config-input-token"><i class="fa fa-globe"></i> Token</label>
         <input type="text" id="node-config-input-token" placeholder="Yandex Alice token">
     </div>
     <div class="form-row">
-        <label for="node-input-cookies"><i class="fa fa-globe"></i> Cookies</label>
+        <label for="node-config-input-cookies"><i class="fa fa-globe"></i> Cookies</label>
         <input type="text" id="node-config-input-cookies" placeholder="Yandex Alice cookies">
     </div>
     <div class="form-row">
@@ -27,22 +27,27 @@
         <input type="text" id="node-config-input-speaker_id" placeholder="Speaker id">
     </div>
     <div class="form-row">
-        <label for="node-input-scenario_id"><i class="fa fa-globe"></i> Scenario id</label>
+        <label for="node-config-input-scenario_id"><i class="fa fa-globe"></i> Scenario id</label>
         <input type="text" id="node-config-input-scenario_id" placeholder="Scenario id">
     </div>
     <div class="form-tips">Set token, cookies, speaker_id, scenario_id to speed up command execution</div><br>
 
     <div class="form-row">
-        <label for="node-input-speaker_name"><i class="fa fa-bokmark"></i> Speaker</label>
+        <label for="node-config-input-speaker_name"><i class="fa fa-bokmark"></i> Speaker</label>
         <input type="text" id="node-config-input-speaker_name" placeholder="Speaker name">
     </div>
     <div class="form-tips">If you has many speakers, can set name of speaker</div><br>
 
     <div class="form-row">
-        <label for="node-input-scenario_name"><i class="fa fa-bokmark"></i> Scenario</label>
+        <label for="node-config-input-scenario_name"><i class="fa fa-bokmark"></i> Scenario</label>
         <input type="text" id="node-config-input-scenario_name" placeholder="Scenario name">
     </div>
     <div class="form-tips">You can set name of scenario</div><br>
+    <div class="form-row">
+        <label for='node-config-input-debug_enable' class="l-width"><i class='fa fa-share-square'></i> Debug</span></label>
+        <input type="checkbox" id="node-config-input-debug_enable" style="display: inline-block; width: auto; vertical-align: top;"></input>
+    </div>
+<br>
 
 </script>
 
@@ -67,7 +72,8 @@
             token: {value: ""},
             cookies: {value: ""},
             scenario_id: {value: ""},
-            speaker_id: {value: ""}
+            speaker_id: {value: ""},
+            debug_enable: {value: false}
         },
         label: function() {
             return this.name || this.username;

@@ -12,12 +12,14 @@ module.exports = function (RED) {
     this.scenario_name = config.scenario_name;
     this.speaker_id = config.speaker_id;
     this.speaker_name = config.speaker_name;
+    this.debug_enable = config.debug_enable;
 
     this.closing = false;
 
     var node = this;
 
-    node.log("Init Yandex Alice Command");
+//    node.log("Init Yandex Alice Command");
+//    node.log("debug is " + this.debug_enable);
 
     node.on("close", function(done)
     {

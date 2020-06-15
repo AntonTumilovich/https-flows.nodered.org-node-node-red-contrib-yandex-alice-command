@@ -10,9 +10,9 @@
     <div class="form-row">
         <label for="node-input-command_type"><i class="icon-tag"></i> Command type</label>
         <select id="node-input-command_type">
-          <option value="json">JSON data</option>
           <option value="tts">Text to speach</option>
           <option value="cmd">Voice command</option>
+          <option value="json">JSON data</option>
         </select>
     </div>
 </script>
@@ -30,16 +30,23 @@
         category: 'Speaker',
         color: '#9874fc',
         defaults: {
+            name: {
+                value: null,
+                required: false
+            },
             login: {
                 type: "yandex-alice-login",
                 required: true
             },
-            command_type: {value:"json"}
+            command_type: {value:"tts"}
         },
         inputs:1,
         outputs:1,
         align: 'right',
-        icon: "alice.png",
+        outputLabels: ["debug"],
+//        icon: 'swiitch.png',
+        icon: 'alice.png',
+//        icon: "icon.png",
         label: function() {
             return this.name||"alice-send";
         },
