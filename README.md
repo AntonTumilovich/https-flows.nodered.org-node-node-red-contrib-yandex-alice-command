@@ -27,6 +27,9 @@ Changes in version 1.10 16/06/20:
 * Added Send to selected speakers: speaker_id and speaker_name as list separated by sybmol ;   
   
   
+Если вам понравился проект, линк для благодарностей ))) https://yasobe.ru/na/ya_alice_command  
+  
+  
 <img src="http://wiki.swiitch.ru/images/3/3e/Node_red_yandex_alice.png">
 <img src="http://wiki.swiitch.ru/images/d/d0/Node_red_yandex_alice_get_token.png">
 <img src="http://wiki.swiitch.ru/images/c/c1/Node_red_yandex_alice_settings.png">
