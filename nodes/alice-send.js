@@ -523,11 +523,21 @@ module.exports = function(RED)
           {
             is_fail_speaker = true;
             if (is_debug) {Debug_Log("Get devices: error: no speakers in account");}
+            node.status({
+              fill: "red",
+              shape: "dot",
+              text: "Alice:no speaker"
+            });
           }
           else if (speaker_id.length < 2)
           {
             is_fail_speaker = true;
             if (is_debug) {Debug_Log("Get devices: error: no speaker in account");}
+            node.status({
+              fill: "red",
+              shape: "dot",
+              text: "Alice:no speaker"
+            });
           }
 /////////////// GET VERIFY SPEAKER End //////////////
 
