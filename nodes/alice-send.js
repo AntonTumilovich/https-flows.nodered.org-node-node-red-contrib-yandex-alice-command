@@ -175,7 +175,9 @@ module.exports = function(RED)
             {
               is_speaker_set = true;
               speaker_id = speaker_id.replace(new RegExp('"', 'g'), '');
-              speaker_id_all.push(speaker_id);
+
+              speaker_id_all = speaker_id.split(';');
+//              speaker_id_all.push(speaker_id);
             }
           }
 
@@ -185,7 +187,8 @@ module.exports = function(RED)
             {
               is_speaker_name_set = true;
               speaker_name = speaker_name.replace(new RegExp('"', 'g'), '');
-              speaker_name_all.push(speaker_name);
+              speaker_name_all = speaker_name.split(';');
+//              speaker_name_all.push(speaker_name);
             }
             else
             {
@@ -482,13 +485,17 @@ module.exports = function(RED)
               {
                 if (is_speaker_name_set)
                 {
-                  if (device_item.name.indexOf(speaker_name) > -1)
+                  speaker_name_all.forEach(function(sp_item, sp_i, sp_arr)
                   {
-                    if (is_debug) {Debug_Log("Get devices: found names speaker " + device_item.name + ", id: " + device_item.id);}
-//                    node.send("found NAMED spekaer is " + device_item.name);
-                    speaker_id = device_item.id;
-                    speaker_id_all.push(speaker_id);
-                  }
+                    if (device_item.name.indexOf(sp_item) > -1)
+                    {
+                      if (is_debug) {Debug_Log("Get devices: found named speaker " + device_item.name + ", id: " + device_item.id);}
+//                      node.send("found NAMED spekaer is " + device_item.name);
+                      speaker_id = device_item.id;
+                      speaker_id_all.push(speaker_id);
+                    }
+                  });
+
                 }
                 else
                 {
@@ -813,6 +820,7 @@ module.exports = function(RED)
                     msg.token = token;
                     msg.cookies = cookies;
                     msg.speaker_id = speaker_id;
+                    msg.speaker_id_all = speaker_id_all;
                     msg.scenario_id = scenario_id;
                     msg.payload = '{"token":"' + token + '","cookies":"' + cookies + '"}';
                     node.send(msg);

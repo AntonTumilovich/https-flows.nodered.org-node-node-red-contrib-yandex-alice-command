@@ -23,6 +23,9 @@ Changes in version 1.07 15/06/20:
 Changes in version 1.08 15/06/20:  
 * Added Send to All speakers or to selected speaker  
   
+Changes in version 1.10 16/06/20:  
+* Added Send to selected speakers: speaker_id and speaker_name as list separated by sybmol ;   
+  
   
 <img src="http://wiki.swiitch.ru/images/3/3e/Node_red_yandex_alice.png">
 <img src="http://wiki.swiitch.ru/images/d/d0/Node_red_yandex_alice_get_token.png">
