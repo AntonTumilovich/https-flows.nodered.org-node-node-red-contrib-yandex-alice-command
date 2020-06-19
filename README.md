@@ -26,8 +26,21 @@ Changes in version 1.08 15/06/20:
 Changes in version 1.10 16/06/20:  
 * Added Send to selected speakers: speaker_id and speaker_name as list separated by sybmol ;   
   
+Changes in version 1.12 16/06/20:  
+* Added Separator sybmol ; or , or |   
   
-Если вам понравился проект, линк для благодарностей ))) https://yasobe.ru/na/ya_alice_command  
+  
+Changes in version 1.14 19/06/20:  
+* Changed Get cookies procedure, now not needed get token  
+  
+  
+  
+THNAKS TO:  
+* https://github.com/AlexxIT/YandexStation  
+* https://github.com/sergejey/majordomo-yadevices  
+  
+  
+Если вам понравился проект - линк для благодарностей https://yasobe.ru/na/ya_alice_command  
   
   
 <img src="http://wiki.swiitch.ru/images/3/3e/Node_red_yandex_alice.png">

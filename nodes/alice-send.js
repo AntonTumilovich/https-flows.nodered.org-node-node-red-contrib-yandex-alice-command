@@ -27,7 +27,7 @@ module.exports = function(RED)
 
         this.username = this.login_node.username;
         this.password = this.login_node.password;
-        this.token = this.login_node.token;
+//        this.token = this.login_node.token;
         this.cookies = this.login_node.cookies;
         this.speaker_name = this.login_node.speaker_name;
         this.scenario_name = this.login_node.scenario_name;
@@ -108,7 +108,7 @@ module.exports = function(RED)
 
           var default_scenario = "Голос";
 
-          var token = node.token;
+//          var token = node.token;
           var cookies = node.cookies;
           var scenario_id = node.scenario_id;
           var speaker_id = node.speaker_id;
@@ -120,15 +120,16 @@ module.exports = function(RED)
 
 
           var is_speaker_name_set = false;
-          var is_token_set = false;
+//          var is_token_set = false;
           var is_cookies_set = false;
           var is_speaker_set = false;
           var is_scenario_set = false;
 
           var is_found_scenario = false;
 
+          var is_speaker_name_all = false;
 
-          var is_fail_token = false;
+//          var is_fail_token = false;
           var is_fail_csrf_token = false;
           var is_fail_cookies = false;
           var is_fail_scenario = false;
@@ -142,6 +143,7 @@ module.exports = function(RED)
 
 /////////////// IF NOT SET TOKEN OR COOKIE : GET IT Begin ////////
 //          if (true)
+/*
           if (typeof(token) != "undefined" && token !== null)
           {
             if (token.length > 0)
@@ -150,7 +152,7 @@ module.exports = function(RED)
               token = token.replace(new RegExp('"', 'g'), '');
             }
           }
-
+*/
           if (typeof(cookies) != "undefined" && cookies !== null)
           {
             if (cookies.length > 0)
@@ -166,6 +168,7 @@ module.exports = function(RED)
             {
               is_scenario_set = true;
               scenario_id = scenario_id.replace(new RegExp('"', 'g'), '');
+              scenario_id = scenario_id.replace(new RegExp(' ', 'g'), '');
             }
           }
 
@@ -175,11 +178,48 @@ module.exports = function(RED)
             {
               is_speaker_set = true;
               speaker_id = speaker_id.replace(new RegExp('"', 'g'), '');
+              speaker_id = speaker_id.replace(new RegExp(' ', 'g'), '|');
+              speaker_id = speaker_id.replace(new RegExp(',', 'g'), '|');
+              speaker_id = speaker_id.replace(new RegExp(';', 'g'), '|');
+//              speaker_id = speaker_id.replace(new RegExp(';;', 'g'), '|');
+//                if (is_debug) {Debug_Log("speaker id is ." + speaker_id + ".");}
 
-              speaker_id_all = speaker_id.split(';');
+              speaker_id_all = speaker_id.split('|');
+//                if (is_debug) {Debug_Log("speaker id count ." + speaker_id_all.length + ".");}
+
+/*
+              if (speaker_id.indexOf(',') > -1)
+              {
+                speaker_id_all = speaker_id.split(',');
+              }
+              else if (speaker_id.indexOf('|') > -1)
+              {
+                speaker_id_all = speaker_id.split('|');
+              }
+              else
+              {
+                speaker_id_all = speaker_id.split(';');
+              }
+*/
 //              speaker_id_all.push(speaker_id);
             }
           }
+////////////////////// NOW REWORK Speaker id Begin ////////////////
+          var tmp_speaker_id_all = speaker_id_all;
+          speaker_id_all = [];
+          tmp_speaker_id_all.forEach(function(item, i, arr)
+          {
+            if (typeof(item) != "undefined" && item != null)
+            {
+              if (item.length > 0)
+              {
+                speaker_id_all.push(item);
+              }
+            }
+          });
+////////////////////// NOW REWORK Speaker id End ////////////////
+
+
 
           if (typeof(speaker_name) != "undefined" && speaker_name !== null)
           {
@@ -187,18 +227,54 @@ module.exports = function(RED)
             {
               is_speaker_name_set = true;
               speaker_name = speaker_name.replace(new RegExp('"', 'g'), '');
-              speaker_name_all = speaker_name.split(';');
+//              speaker_name = speaker_name.replace(new RegExp(' ', 'g'), '|');
+              speaker_name = speaker_name.replace(new RegExp(',', 'g'), '|');
+              speaker_name = speaker_name.replace(new RegExp(';', 'g'), '|');
+
+
+              speaker_name_all = speaker_name.split('|');
+                if (is_debug) {Debug_Log("speaker name count ." + speaker_name_all.length + ".");}
+/*
+              if (speaker_name.indexOf(',') > -1)
+              {
+                speaker_name_all = speaker_name.split(',');
+              }
+              else if (speaker_name.indexOf('|') > -1)
+              {
+                speaker_name_all = speaker_name.split('|');
+              }
+              else
+              {
+                speaker_name_all = speaker_name.split(';');
+              }
+*/
 //              speaker_name_all.push(speaker_name);
             }
             else
             {
-              speaker_name_all = true;
+              is_speaker_name_all = true;
             }
           }
           else
           {
-            speaker_name_all = true;
+            is_speaker_name_all = true;
           }
+
+////////////////////// NOW REWORK Speaker name Begin ////////////////
+          var tmp_speaker_name_all = speaker_name_all;
+          speaker_name_all = [];
+          tmp_speaker_name_all.forEach(function(item, i, arr)
+          {
+            if (typeof(item) != "undefined" && item != null)
+            {
+              if (item.length > 0)
+              {
+                speaker_name_all.push(item);
+              }
+            }
+          });
+////////////////////// NOW REWORK Speaker name End ////////////////
+
 
           if (typeof(scenario_name) != "undefined" && scenario_name !== null)
           {
@@ -224,7 +300,20 @@ module.exports = function(RED)
         {
               function redirect_go(body, response, resolveWithFullResponse)
               {
-                if (is_debug) {Debug_Log("Get cookies: stage 2: redirect");}
+                if (is_debug) {Debug_Log("Get cookies: stage 2: begin");}
+//                if (typeof() == "undefined" || body === null)
+                if (response.statusCode != 302)
+                {
+                  is_fail_cookies = true;
+//                  Debug_Log("Get cookies:stage 2: fail " + JSON.stringify(response));
+                  Debug_Log("Get cookies:stage 2: fail " + response.statusCode);
+                  node.status({
+                   fill: "red",
+                    shape: "dot",
+                    text: "Alice:error:cookies:stage 2:"+ response.statusCode
+                  });
+                }
+
 //                node.send(body);
 //                node.send(resolveWithFullResponse);
                 var headers = response.headers;
@@ -237,13 +326,16 @@ module.exports = function(RED)
                   cookies += tmp_cookie;
                 });
 //                node.send("full cookies is " + cookies);
+//                node.log("full cookies is " + cookies);
+//                node.log("full cookies response is " + JSON.stringify(response));
 ///////////////// SEND MESSAGE IN THIS STRING ///////////
                 if (response.statusCode === 302) {} else {}
+                if (is_debug) {Debug_Log("Get cookies: stage 2: end");}
               }
 //////// function for get cookie on login end /////
 
 
-
+/*
           if (!is_token_set)
           {
 /////////////// GET MAIN TOKEN Begin //////////////
@@ -262,7 +354,6 @@ module.exports = function(RED)
             body: 'client_secret=' + y_alice.client_secret + '&client_id=' + y_alice.client_id + '&grant_type=' + 'password' + '&username=' + encode_username + '&password=' + encode_password,
 //            body: 'client_secret=' + y_alice.client_secret + '&client_id=' + y_alice.client_id + '&grant_type=' + 'password' + '&username=' + node.username + '&password=' + node.password,
              headers: {
-        /* 'content-type': 'application/x-www-form-urlencoded' */ // Is set automatically
             },
             resolveWithFullResponse: true,
             json: false // Automatically stringifies the body to JSON
@@ -286,7 +377,7 @@ module.exports = function(RED)
           node.status({
             fill: "red",
             shape: "dot",
-            text: "Alice:token:error:" + err
+            text: "Alice:error:token:" + err
           });
 
 //          if (err.indexOf('login or password is not valid') > -1) {Debug_Log('Login or password is not valid');}
@@ -294,8 +385,9 @@ module.exports = function(RED)
         });
 /////////////// GET MAIN TOKEN End //////////////
 }
-
-          if (!is_cookies_set && !is_fail_token)
+*/
+//          if (!is_cookies_set && !is_fail_token)
+          if (!is_cookies_set)
           {
 
           if (is_debug) {Debug_Log("Get cookies: begin");}
@@ -308,14 +400,19 @@ module.exports = function(RED)
             var options =
             {
               method: 'POST',
-              uri: 'https://registrator.mobile.yandex.net/1/bundle/auth/x_token/',
-              body: 'type=' + 'x-token' + '&retpath=' + 'https://www.yandex.ru/androids.txt',
+//              uri: 'https://registrator.mobile.yandex.net/1/bundle/auth/x_token/',
+              uri: 'https://passport.yandex.ru/passport?mode=auth&retpath=https://yandex.ru',
+//              body: 'type=' + 'x-token' + '&retpath=' + 'https://www.yandex.ru/androids.txt',
+              body: 'login=' + node.username + '&passwd=' + node.password,
               headers: {
                  'Content-type' : 'application/x-www-form-urlencoded',
-                 'Ya-Consumer-Authorization' : 'OAuth ' + token
+//                 'Ya-Consumer-Authorization' : 'OAuth ' + token
               },
               resolveWithFullResponse: true,
-              json: false // Automatically stringifies the body to JSON
+              json: false, // Automatically stringifies the body to JSON
+                followRedirect: false,
+                followAllRedirects : false,
+                transform: redirect_go
             };
 
 
@@ -330,10 +427,17 @@ module.exports = function(RED)
 //              node.send(body);
             })
             .catch(function (err) {
+//              is_fail_cookies = true;
+//              Debug_Log("Get cookies: fail " + err);
+//              node.status({
+//                fill: "red",
+//                shape: "dot",
+//                text: "Alice:error:cookies:fail"
+//              });
 //              node.send("get cookie - fail " + err);
             });
 
-
+/*
               if (is_debug) {Debug_Log("Get cookies: stage 2: begin");}
               var options =
               {
@@ -368,14 +472,14 @@ module.exports = function(RED)
 //                node.send(body);
 //                node.send("get cookie stage 2  - fail " + err);
               });
-
+*/
 /////////////// GET COOKIES End //////////////
           }
 /////////////// IF NOT SET TOKEN OR COOKIE : GET IT End ////////
 
 
 /////////////// GET CSRF TOKEN Begin //////////////
-          if (!is_fail_token && !is_fail_cookies)
+          if (!is_fail_cookies)
           {
             if (is_debug) {Debug_Log("Get csrf token: begin");}
             var options =
@@ -385,7 +489,7 @@ module.exports = function(RED)
 //              body: 'client_secret=' + y_alice.client_secret + '&client_id=' + y_alice.client_id + '&grant_type=' + 'password' + '&username=' + node.username + '&password=' + node.password,
               headers: {
                  'Content-type' : 'application/x-www-form-urlencoded',
-                 'Ya-Consumer-Authorization' : 'OAuth ' + token,
+//                 'Ya-Consumer-Authorization' : 'OAuth ' + token,
                  'Cookie' : cookies
               },
               resolveWithFullResponse: true,
@@ -418,7 +522,7 @@ module.exports = function(RED)
               node.status({
                 fill: "red",
                 shape: "dot",
-                text: "Alice:csrf token:error:" + err
+                text: "Alice:error:csrf token:" + err
               });
               return;
             });
@@ -432,8 +536,8 @@ module.exports = function(RED)
 //          node.send(msg);
 
 
-          if (!is_speaker_set && !is_fail_token && !is_fail_cookies)
-          {
+          if (!is_speaker_set && !is_fail_cookies)
+          {////// begin work with devices
             var devices_data = '';
 /////////////// GET devices Begin //////////////
             if (is_debug) {Debug_Log("Get devices: begin");}
@@ -444,7 +548,7 @@ module.exports = function(RED)
 //              body: 'client_secret=' + y_alice.client_secret + '&client_id=' + y_alice.client_id + '&grant_type=' + 'password' + '&username=' + node.username + '&password=' + node.password,
               headers: {
                  'Content-type' : 'application/x-www-form-urlencoded',
-                 'Ya-Consumer-Authorization' : 'OAuth ' + token,
+//                 'Ya-Consumer-Authorization' : 'OAuth ' + token,
                  'Cookie' : cookies
               },
               resolveWithFullResponse: true,
@@ -466,13 +570,14 @@ module.exports = function(RED)
               node.status({
                 fill: "red",
                 shape: "dot",
-                text: "Alice:devices:error:" + err
+                text: "Alice:error:devices:" + err
               });
             });
 /////////////// GET devices End //////////////
 
 /////////////// GET Search SPEAKER Begin //////////////
 //        if (device_data.rooms.length > 0)
+
         if (typeof(devices_data.rooms) != "undefined" && devices_data.rooms != null && !is_fail_speaker)
         {
           devices_data.rooms.forEach(function(item, i, arr)
@@ -516,7 +621,6 @@ module.exports = function(RED)
         }
 ////         node.send("room is " + devices.rooms[0].name);
 /////////////// GET Search SPEAKER End //////////////
-         }
 
 /////////////// GET VERIFY SPEAKER Begin //////////////
           if (typeof(speaker_id) == "undefined" || speaker_id == null)
@@ -526,7 +630,7 @@ module.exports = function(RED)
             node.status({
               fill: "red",
               shape: "dot",
-              text: "Alice:no speaker"
+              text: "Alice:error:no speaker"
             });
           }
           else if (speaker_id.length < 2)
@@ -536,14 +640,15 @@ module.exports = function(RED)
             node.status({
               fill: "red",
               shape: "dot",
-              text: "Alice:no speaker"
+              text: "Alice:error:no speaker"
             });
           }
 /////////////// GET VERIFY SPEAKER End //////////////
+         }//// end work with devices
 
 
 
-          if (!is_scenario_set && !is_fail_token && !is_fail_cookies)
+          if (!is_scenario_set && !is_fail_cookies)
           {
             var scenarios_data = '';
 /////////////// GET scenarios Begin //////////////
@@ -555,7 +660,7 @@ module.exports = function(RED)
 //              body: 'client_secret=' + y_alice.client_secret + '&client_id=' + y_alice.client_id + '&grant_type=' + 'password' + '&username=' + node.username + '&password=' + node.password,
               headers: {
                  'Content-type' : 'application/x-www-form-urlencoded',
-                 'Ya-Consumer-Authorization' : 'OAuth ' + token,
+//                 'Ya-Consumer-Authorization' : 'OAuth ' + token,
                  'Cookie' : cookies
               },
               resolveWithFullResponse: true,
@@ -578,7 +683,7 @@ module.exports = function(RED)
               node.status({
                 fill: "red",
                 shape: "dot",
-                text: "Alice:scenarios:get:error:" + err
+                text: "Alice:error:get:scenarios:" + err
               });
             });
 /////////////// GET scenarios End //////////////
@@ -639,7 +744,7 @@ module.exports = function(RED)
 
                 headers: {
                  'Content-type' : 'application/x-www-form-urlencoded',
-                 'Ya-Consumer-Authorization' : 'OAuth ' + token,
+//                 'Ya-Consumer-Authorization' : 'OAuth ' + token,
                  'x-csrf-token' : csrf_token,
                  'Cookie' : cookies
                 },
@@ -663,7 +768,7 @@ module.exports = function(RED)
                 node.status({
                   fill: "red",
                   shape: "dot",
-                  text: "Alice:scenarios:add:error:" + err
+                  text: "Alice:error:add:scenarios:" + err
                 });
               });
 /////////////// ADD scenarios End //////////////
@@ -695,7 +800,7 @@ module.exports = function(RED)
 
 
 ////////////////////// NOW SEND COMMAND Begin ////////////////
-            if (!is_fail_token && !is_fail_cookies && speaker_id.length > 0 && scenario_id.length > 0 && !is_fail_speaker && !is_fail_scenario && speaker_id_all.length > 0)
+            if (!is_fail_cookies && speaker_id.length > 0 && scenario_id.length > 0 && !is_fail_speaker && !is_fail_scenario && speaker_id_all.length > 0)
             {
               if (is_debug) {Debug_Log("Execute command: begin");}
 
@@ -717,20 +822,21 @@ module.exports = function(RED)
               send_data.external_actions = new Array();
               speaker_id_all.forEach(function(item, i, arr)
               {
-                send_data.external_actions.push(new Object());
-                send_data.external_actions[i].type = new String('scenario.external_action.' + action);
-                send_data.external_actions[i].parameters = {};
-                send_data.external_actions[i].parameters.current_device = new Boolean(false);
-//                send_data.external_actions[speaker_num].parameters.device_id = new String(speaker_id);
-                send_data.external_actions[i].parameters.device_id = new String(item);
-                if (is_cmd)
-                {
-                  send_data.external_actions[i].parameters.text = new String(text);
-                }
-                else
-                {
-                  send_data.external_actions[i].parameters.phrase = new String(text);
-                }
+                  if (is_debug) {Debug_Log("Execute command: add speaker id ." + item + ".");}
+                  send_data.external_actions.push(new Object());
+                  send_data.external_actions[i].type = new String('scenario.external_action.' + action);
+                  send_data.external_actions[i].parameters = {};
+                  send_data.external_actions[i].parameters.current_device = new Boolean(false);
+//                  send_data.external_actions[speaker_num].parameters.device_id = new String(speaker_id);
+                  send_data.external_actions[i].parameters.device_id = new String(item);
+                  if (is_cmd)
+                  {
+                    send_data.external_actions[i].parameters.text = new String(text);
+                  }
+                  else
+                  {
+                    send_data.external_actions[i].parameters.phrase = new String(text);
+                  }
               });
 
 
@@ -747,7 +853,7 @@ module.exports = function(RED)
 
                 headers: {
                  'Content-type' : 'application/x-www-form-urlencoded',
-                 'Ya-Consumer-Authorization' : 'OAuth ' + token,
+//                 'Ya-Consumer-Authorization' : 'OAuth ' + token,
                  'x-csrf-token' : csrf_token,
                  'Cookie' : cookies
                 },
@@ -771,7 +877,7 @@ module.exports = function(RED)
                 node.status({
                   fill: "red",
                   shape: "dot",
-                  text: "Alice:scenarios:update:error:" + err
+                  text: "Alice:error:update:scenarios:" + err
                 });
               });
 
@@ -782,7 +888,7 @@ module.exports = function(RED)
                 body: send_data_str,
                 headers: {
                  'Content-type' : 'application/x-www-form-urlencoded',
-                 'Ya-Consumer-Authorization' : 'OAuth ' + token,
+//                 'Ya-Consumer-Authorization' : 'OAuth ' + token,
                  'x-csrf-token' : csrf_token,
                  'Cookie' : cookies
                 },
@@ -798,7 +904,7 @@ module.exports = function(RED)
                 node.status({
                     fill: "green",
                     shape: "dot",
-                    text: "Alice:run:ok"
+                    text: "Alice:ok"
                 });
 
 //                node.send(body);
@@ -812,7 +918,7 @@ module.exports = function(RED)
                 node.status({
                   fill: "red",
                   shape: "dot",
-                  text: "Alice:scenarios:run:error:" + err
+                  text: "Alice:error:run:scenarios:" + err
                 });
               });
             }
@@ -822,17 +928,18 @@ module.exports = function(RED)
 
 ///////////////// SEND DATA Begin ///////////
 
-                if (!is_token_set || !is_cookies_set || !is_speaker_set || !is_scenario_set)
+                if (!is_cookies_set || !is_speaker_set || !is_scenario_set)
                 {
-                  if (!is_fail_token && !is_fail_cookies && !is_fail_scenario && !is_fail_speaker)
+                  if (!is_fail_cookies && !is_fail_scenario && !is_fail_speaker)
                   {
                     if (is_debug) {Debug_Log("Show all data: ok");}
-                    msg.token = token;
+//                    msg.token = token;
                     msg.cookies = cookies;
                     msg.speaker_id = speaker_id;
                     msg.speaker_id_all = speaker_id_all;
                     msg.scenario_id = scenario_id;
-                    msg.payload = '{"token":"' + token + '","cookies":"' + cookies + '"}';
+                    msg.payload = '{"cookies":"' + cookies + '"}';
+//                    msg.payload = '{"token":"' + token + '","cookies":"' + cookies + '"}';
                     node.send(msg);
                   }
                 }

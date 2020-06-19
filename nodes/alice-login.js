@@ -5,7 +5,7 @@ module.exports = function (RED) {
 
     this.username = config.username;
     this.password = config.password;
-    this.token = config.token;
+//    this.token = config.token;
     this.cookies = config.cookies;
 
     this.scenario_id = config.scenario_id;
