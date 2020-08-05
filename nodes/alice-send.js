@@ -854,7 +854,7 @@ module.exports = function(RED)
 
               send_data_str = JSON.stringify(send_data);
 //              node.send(send_data);
-              node.send("to send : " + send_data_str);
+//              node.send("to send : " + send_data_str);
 
               var options =
               {
