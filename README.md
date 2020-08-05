@@ -34,6 +34,10 @@ Changes in version 1.14 19/06/20:
 * Changed Get cookies procedure, now not needed get token  
   
   
+Changes in version 1.15 05/08/20:  
+* Fixed for new Yandex Alice API  
+  
+  
   
 THNAKS TO:  
 * https://github.com/AlexxIT/YandexStation  

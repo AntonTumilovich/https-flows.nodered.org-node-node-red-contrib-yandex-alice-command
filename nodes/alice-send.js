@@ -808,41 +808,53 @@ module.exports = function(RED)
               if (is_cmd)
               {
                 action = 'text';
+                new_action = 'text_action';
               }
               else
               {
                 action = 'phrase';
+                new_action = 'phrase_action';
               }
 
               var send_data = {};
               send_data.name = scenario_name;
               send_data.icon = new String('home');
               send_data.trigger_type = new String('scenario.trigger.voice');
+              send_data.requested_speaker_capabilities = new Array();
               send_data.devices = new Array();
-              send_data.external_actions = new Array();
+//              send_data.external_actions = new Array();
               speaker_id_all.forEach(function(item, i, arr)
               {
                   if (is_debug) {Debug_Log("Execute command: add speaker id ." + item + ".");}
-                  send_data.external_actions.push(new Object());
-                  send_data.external_actions[i].type = new String('scenario.external_action.' + action);
-                  send_data.external_actions[i].parameters = {};
-                  send_data.external_actions[i].parameters.current_device = new Boolean(false);
-//                  send_data.external_actions[speaker_num].parameters.device_id = new String(speaker_id);
-                  send_data.external_actions[i].parameters.device_id = new String(item);
-                  if (is_cmd)
-                  {
-                    send_data.external_actions[i].parameters.text = new String(text);
-                  }
-                  else
-                  {
-                    send_data.external_actions[i].parameters.phrase = new String(text);
-                  }
+                  send_data.devices.push(new Object());
+                  send_data.devices[i].id =  new String(item);
+
+                  send_data.devices[i].capabilities = new Array();
+                  send_data.devices[i].capabilities.push(new Object());
+                  send_data.devices[i].capabilities[0].type = new String("devices.capabilities.quasar.server_action");
+                  send_data.devices[i].capabilities[0].state = new Object();
+                  send_data.devices[i].capabilities[0].state.instance = new String(new_action);
+                  send_data.devices[i].capabilities[0].state.value = new String(text);
+//                  send_data.external_actions.push(new Object());
+//                  send_data.external_actions[i].type = new String('scenario.external_action.' + action);
+//                  send_data.external_actions[i].parameters = {};
+//                  send_data.external_actions[i].parameters.current_device = new Boolean(false);
+////                  send_data.external_actions[speaker_num].parameters.device_id = new String(speaker_id);
+//                  send_data.external_actions[i].parameters.device_id = new String(item);
+//                  if (is_cmd)
+//                  {
+//                    send_data.external_actions[i].parameters.text = new String(text);
+//                  }
+//                  else
+//                  {
+//                    send_data.external_actions[i].parameters.phrase = new String(text);
+//                  }
               });
 
 
               send_data_str = JSON.stringify(send_data);
 //              node.send(send_data);
-//              node.send("to send : " + send_data_str);
+              node.send("to send : " + send_data_str);
 
               var options =
               {
