@@ -39,7 +39,7 @@ Changes in version 1.15 05/08/20:
   
   
 Changes in version 1.17 27/11/20:  
-* Fixed spaker not in rooms   
+* Fixed speaker not in room   
   
   
   
