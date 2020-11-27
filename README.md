@@ -35,7 +35,11 @@ Changes in version 1.14 19/06/20:
   
   
 Changes in version 1.15 05/08/20:  
-* Fixed for new Yandex Alice API  
+* Fixed for new Yandex Alice APIn  
+  
+  
+Changes in version 1.17 27/11/20:  
+* Fixed spaker not in rooms   
   
   
   

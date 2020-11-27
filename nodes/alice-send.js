@@ -592,7 +592,8 @@ module.exports = function(RED)
                 {
                   speaker_name_all.forEach(function(sp_item, sp_i, sp_arr)
                   {
-                    if (device_item.name.indexOf(sp_item) > -1)
+//                    if (device_item.name.indexOf(sp_item) > -1)
+                    if (device_item.name == sp_item)
                     {
                       if (is_debug) {Debug_Log("Get devices: found named speaker " + device_item.name + ", id: " + device_item.id);}
 //                      node.send("found NAMED spekaer is " + device_item.name);
@@ -611,6 +612,49 @@ module.exports = function(RED)
                 }
               }
             });
+          });
+
+
+        }
+        else
+        {
+          if (is_debug) {Debug_Log("Get devices: error: no devices in account");}
+        }
+
+        if (typeof(devices_data.speakers) != "undefined" && devices_data.speakers != null && !is_fail_speaker)
+        {
+//          devices_data.rooms.forEach(function(item, i, arr)
+//          {
+//          node.send("room " + i + " name is " + item.name);
+//            room_devices = item.devices;
+            devices_data.speakers.forEach(function(device_item, i, arr)
+            {
+              if (device_item.type.indexOf("devices.types.smart_speaker") > -1 || device_item.type.indexOf("yandex.module") > -1)
+              {
+                if (is_speaker_name_set)
+                {
+                  speaker_name_all.forEach(function(sp_item, sp_i, sp_arr)
+                  {
+//                    if (device_item.name.indexOf(sp_item) > -1)
+                    if (device_item.name == sp_item)
+                    {
+                      if (is_debug) {Debug_Log("Get devices: found named speaker " + device_item.name + ", id: " + device_item.id);}
+//                      node.send("found NAMED spekaer is " + device_item.name);
+                      speaker_id = device_item.id;
+                      speaker_id_all.push(speaker_id);
+                    }
+                  });
+
+                }
+                else
+                {
+//                node.send("found speaker is " + device_item.name);
+                  speaker_id = device_item.id;
+                  speaker_id_all.push(speaker_id);
+                  if (is_debug) {Debug_Log("Get devices: found speaker " + device_item.name + ", id: " + device_item.id);}
+                }
+              }
+//            });
           });
 
 
@@ -693,7 +737,8 @@ module.exports = function(RED)
           scenarios_data.scenarios.forEach(function(item, i, arr)
           {
 //            node.send("scenarios " + i + " name is " + item.name);
-            if (item.name.indexOf(scenario_name) > -1)
+//            if (item.name.indexOf(scenario_name) > -1)
+            if (item.name == scenario_name)
             {
 //              node.send("found scenario is " + item.name);
               scenario_id = item.id;
@@ -778,7 +823,8 @@ module.exports = function(RED)
           scenarios_data.scenarios.forEach(function(item, i, arr)
           {
 //            node.send("scenarios " + i + " name is " + item.name);
-            if (item.name.indexOf(scenario_name) > -1)
+//            if (item.name.indexOf(scenario_name) > -1)
+            if (item.name == scenario_name)
             {
 //              node.send("found scenario is " + item.name);
               scenario_id = item.id;
