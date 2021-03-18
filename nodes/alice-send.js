@@ -767,7 +767,12 @@ module.exports = function(RED)
 //              send_data.push(new Object());
               send_data.name = scenario_name;
               send_data.icon = new String('home');
-              send_data.trigger_type = new String('scenario.trigger.voice');
+              send_data.triggers = new Array();
+              send_data.triggers.push(new Object());
+              send_data.triggers[0].type = new String('scenario.trigger.voice');
+              send_data.triggers[0].value = scenario_name;
+
+//              send_data.trigger_type = new String('scenario.trigger.voice');
               send_data.devices = new Array();
               send_data.external_actions = new Array();
               send_data.external_actions.push(new Object());
@@ -865,7 +870,12 @@ module.exports = function(RED)
               var send_data = {};
               send_data.name = scenario_name;
               send_data.icon = new String('home');
-              send_data.trigger_type = new String('scenario.trigger.voice');
+//              send_data.trigger_type = new String('scenario.trigger.voice');
+              send_data.triggers = new Array();
+              send_data.triggers.push(new Object());
+              send_data.triggers[0].type = new String('scenario.trigger.voice');
+              send_data.triggers[0].value = scenario_name;
+
               send_data.requested_speaker_capabilities = new Array();
               send_data.devices = new Array();
 //              send_data.external_actions = new Array();
