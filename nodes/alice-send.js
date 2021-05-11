@@ -393,17 +393,19 @@ module.exports = function(RED)
           if (is_debug) {Debug_Log("Get cookies: begin");}
 
 
+//Debug_Log("Get cookies: begin, pass is " + node.password + ", encoded " + encodeURIComponent(node.password));
+
 /////////////// GET COOKIES Begin //////////////
             var passport_host = '';
             var track_id = '';
-
             var options =
             {
               method: 'POST',
 //              uri: 'https://registrator.mobile.yandex.net/1/bundle/auth/x_token/',
               uri: 'https://passport.yandex.ru/passport?mode=auth&retpath=https://yandex.ru',
 //              body: 'type=' + 'x-token' + '&retpath=' + 'https://www.yandex.ru/androids.txt',
-              body: 'login=' + node.username + '&passwd=' + node.password,
+//              body: 'login=' + node.username + '&passwd=' + node.password,
+              body: 'login=' + node.username + '&passwd=' + encodeURIComponent(node.password),
               headers: {
                  'Content-type' : 'application/x-www-form-urlencoded',
 //                 'Ya-Consumer-Authorization' : 'OAuth ' + token

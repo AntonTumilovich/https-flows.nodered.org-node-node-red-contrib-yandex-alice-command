@@ -46,6 +46,10 @@ Changes in version 1.18 18/03/21:
 * Fixed for scenario new API   
   
   
+Changes in version 1.19 11/05/21:  
+* Fixed spec chars in password   
+  
+  
   
 THNAKS TO:  
 * https://github.com/AlexxIT/YandexStation  
@@ -59,3 +63,12 @@ THNAKS TO:
 <img src="http://wiki.swiitch.ru/images/d/d0/Node_red_yandex_alice_get_token.png">
 <img src="http://wiki.swiitch.ru/images/c/c1/Node_red_yandex_alice_settings.png">
 <img src="http://wiki.swiitch.ru/images/8/8c/Node_red_yandex_alice_login.png">
+  
+  
+  
+Альтернативный способ получения Cookies:
+1. Зайти на https://yandex.ru/quasar/iot
+2. Открыть панель разработчика
+3. Найти запрос к странице и там взять отправленные cookies
+<img src="http://wiki.swiitch.ru/images/6/66/Node_red_yandex_alice_get_cookies_alt.png">
+  

@@ -19,7 +19,7 @@
     "type": "git",
     "url": "git+https://github.com/AntonTumilovich/https-flows.nodered.org-node-node-red-contrib-yandex-alice-command.git"
   },
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "yandex-alice-command system",
   "main": "yandex-alice-command.js",
   "scripts": {
